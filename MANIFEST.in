@@ -1,0 +1,18 @@
+include MANIFEST.in
+include requirements.txt
+include *.json
+include *.md
+include *.py
+include *.txt
+recursive-include prbot *.css
+recursive-include prbot *.csv
+recursive-include prbot *.html
+recursive-include prbot *.ico
+recursive-include prbot *.js
+recursive-include prbot *.json
+recursive-include prbot *.md
+recursive-include prbot *.png
+recursive-include prbot *.py
+recursive-include prbot *.svg
+recursive-include prbot *.txt
+recursive-exclude prbot *.pyc
