@@ -155,3 +155,12 @@ def run_instance(context, required_bench_instance, SITE_NAME):
 
 
 # TODO: run the server, post comment on the pr, remove instance and replace with new instance
+
+"""
+TODO:
+1. Redis
+	All benches shouldve common redis
+2. On new PR instance request:
+	- app: revert, pull, apply patch, bench restart
+	- site: rename, reinstall --yes
+"""
