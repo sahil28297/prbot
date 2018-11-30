@@ -8,6 +8,8 @@ import frappe
 import json
 import subprocess
 import os
+import urllib
+from github import Github
 
 class PrbotBench(Document):
 	pass
@@ -75,7 +77,7 @@ def create_bench(context, existing_bench_count):
 	testing = frappe.get_doc({
 	'doctype': 'Prbot Bench',
 	'bench_name': BENCH_NAME,
-	'pr_no': context['issue']['url'].split('/')[-1],
+	'pr_no': context['issue']['number'],
 	'app_being_tested': context['repository']['name'],
 	'python_version': BENCH_PY_VERSION,
 	'requested_by': context['comment']['user']['login'],
@@ -99,25 +101,57 @@ def check_maximum_allowed_benches(comment):
 def get_site(context, required_bench_instance):
 	# creating a new get_site
 	APP_BEING_TESTED =  context['repository']['name']
-	PR_NO = context['issue']['url'].split('/')[-1]
+	PR_NO = context['issue']['number']
 	DOMAIN_NAME = frappe.get_single("Prbot Global Config").star_domain
 	DOMAIN_NAME = DOMAIN_NAME[1:]
 	print(required_bench_instance)
 	print(APP_BEING_TESTED)
-	if "frappe" == APP_BEING_TESTED:
-		APP_NAME = "f"
-	elif "erpnext" == APP_BEING_TESTED:
-		APP_NAME = "e"
-	else:
-		APP_NAME = "wtf"
+	APP_NAME = APP_BEING_TESTED[0]
 	print(APP_NAME)
 	SITE_NAME = "{app}{prno}{domain}".format(app=APP_NAME, prno=PR_NO, domain=DOMAIN_NAME)
 	os.chdir("/home/sahil/benches/{bench}".format(bench=required_bench_instance))
 	os.chdir("/home/sahil/benches/{bench}/sites".format(bench=required_bench_instance))
 	open('currentsite.txt', 'w').close()
-	# subprocess.call('bench', 'get-app', APP_BEING_TESTED)
 	# subprocess.call('bench', 'new-site', SITE_NAME)
-	# subprocess.call('bench', '--site', SITE_NAME, 'install-app', APP_BEING_TESTED)
+	setup_app(context, required_bench_instance)
+	print("sasasas")
+	run_instance(context, required_bench_instance, SITE_NAME)
 	return SITE_NAME
-
 	# fetching existing site
+
+
+
+def setup_app(context, required_bench_instance):
+	APP_BEING_TESTED =  context['repository']['name']
+	PATCH_URL = context['issue']['pull_request']['patch_url']
+	PATCH_NAME = str(context['issue']['number']) + '.patch'
+	# os.chdir("/home/sahil/benches/{bench}".format(bench=required_bench_instance))
+	# subprocess.call('bench', 'get-app', APP_BEING_TESTED)
+	# os.chdir("/home/sahil/benches/{bench}/apps/{APPNAME}".format(bench=required_bench_instance, APPNAME=APP_BEING_TESTED))
+	# subprocess.call('git', 'checkout', BRANCH_NAME)
+	# TODO: download patch, run patch in app
+	print('dsasssa')
+	# urllib.request.urlretrieve(PATCH_URL, PATCH_NAME)
+	# subprocess.call('ls')
+	# subprocess.call('patch', '-p1', '<', PATCH_NAME)
+	# os.chdir("/home/sahil/benches/{bench}".format(bench=required_bench_instance))
+	# subprocess.call('bench', '--site', SITE_NAME, 'install-app', APP_BEING_TESTED)
+
+
+def run_instance(context, required_bench_instance, SITE_NAME):
+	# subprocess.call('bench', 'start')
+	# TODO: add bench logging
+	print("ghbdhddfg")
+	import traceback
+	REPO_NAME =  context['repository']['full_name']
+	PR_NO = context['issue']['number']
+	g = Github("frappe-bot", "password")
+	repo = g.get_repo(REPO_NAME)
+	pr = repo.get_pull(PR_NO)
+	traceback.print_stack()
+	print(REPO_NAME, PR_NO)
+	print("Your test instance has been created, please access it at {SITE_NAME}".format(SITE_NAME=SITE_NAME))
+	pr.create_issue_comment("Your test instance has been created, please access it at {SITE_NAME}".format(SITE_NAME=SITE_NAME))
+
+
+# TODO: run the server, post comment on the pr, remove instance and replace with new instance
