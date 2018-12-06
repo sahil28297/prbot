@@ -240,4 +240,17 @@ class QueueDatabase():
 			return self.redis_wrapper.sismember('prbot_set', value)
 
 
+
 # def destroy_instance(context):
+
+# TODO: run the server, post comment on the pr, remove instance and replace with new instance
+
+"""
+TODO:
+1. Redis
+	All benches shouldve common redis
+2. On new PR instance request:
+	- app: revert, pull, apply patch, bench restart
+	- site: rename, reinstall --yes
+"""
+
